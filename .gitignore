@@ -1,0 +1,5 @@
+.DS_Store
+.venv
+benchmark/data
+benchmark/images
+code/__pycache__

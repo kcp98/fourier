@@ -53,7 +53,7 @@ def make_plot(fname : str, title : str):
 
 def make_reference_plots():
     fig, (ax1, ax2, ax3) = plt.subplots(1,3)
-    fig.suptitle(f"Reference frame", fontsize=16)
+    fig.suptitle(f"Reference frame for polynomial multiplication", fontsize=16)
     fig.set_size_inches(18, 6)
 
     if True: # long mul
@@ -99,10 +99,62 @@ def make_reference_plots():
 
         ax3.set_xticklabels([f"2^{j:.0f}" for j in np.log2(x[-4::])])
 
-    fig.savefig(f"benchmark/images/ref.png")
+    fig.savefig(f"benchmark/images/fmul_ref.png")
     fig.clear()
 
+def make_reference_plots_div():
+    fig, (ax1, ax2, ax3) = plt.subplots(1,3)
+    fig.suptitle(f"Reference frame for polynomial division", fontsize=16)
+    fig.set_size_inches(18, 6)
+
+    if True: # long mul
+        array = np.loadtxt(f"benchmark/data/ldiv.txt")
+        x, y = array[:,0], array[:,1]
+        f, r2 = regression(x * x, y)
+        ax1.plot(x, f, '-', color="darkorchid")
+        ax1.plot(x, y, '.', color="black")
+        ax1.annotate(f"$R^2 = {r2[0]:0.5f}$", (max(x)/2, 0), fontsize=14)
+        ax1.set_title(r"$O(n^2)$ for long division", fontsize=14)
+        ax1.set_ylabel('time (seconds)', fontsize=14)
+        ax1.set_xlabel('input size', fontsize=14)
+        ax1.set_xticks(x[-4::])
+        ax1.set_yticks(y[-4::])
+        ax1.set_xticklabels([f"2^{j:.0f}" for j in np.log2(x[-4::])])
+
+    if True: # numpy
+        array = np.loadtxt(f"benchmark/data/ndiv.txt")
+        x, y = array[:,0], array[:,1]
+        f, r2 = regression(x * x, y)
+        ax2.plot(x, f, '-', color="deepskyblue")
+        ax2.plot(x,  y, '.', color="black")
+        ax2.annotate(f"$R^2 = {r2[0]:0.6f}$", (max(x)/2, 0), fontsize=14)
+        ax2.set_title(r"$O(n^2)$ for numpys polydiv", fontsize=14)
+        ax2.set_xticks(x[-4::])
+        ax2.set_yticks(y[-4::])
+        ax2.set_xticklabels([f"2^{j:.0f}" for j in np.log2(x[-4::])])
+    
+    if True: # numpy vs. fdiv
+        array = np.loadtxt(f"benchmark/data/ndiv.txt")
+        x, y = array[:,0], array[:,1]
+        ax3.plot(x, y, '-', color="deepskyblue")
+        ax3.plot(x, y, '.', color="black")
+        
+        array = np.loadtxt(f"benchmark/data/fdiv.txt")
+        x, y = array[:,0], array[:,1]
+        ax3.plot(x, y, '-', color="orchid")
+        ax3.plot(x, y, '.', color="gray")
+
+        ax3.set_title(r"numpy vs. fdiv", fontsize=14)
+        ax3.set_xticks(x[-4::])
+        ax3.set_yticks(y[-4::])
+
+        ax3.set_xticklabels([f"2^{j:.0f}" for j in np.log2(x[-4::])])
+
+    fig.savefig(f"benchmark/images/fdiv_ref.png")
+    fig.clear()
 
 if __name__ == "__main__":
     make_plot("fmul", "fft multiplication")
     make_reference_plots()
+    make_plot("fdiv", "fft division")
+    make_reference_plots_div()

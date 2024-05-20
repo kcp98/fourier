@@ -48,3 +48,7 @@ def __compares():
 
 if __name__ == "__main__":
     __compares()
+    bg = 2**16
+    x = np.linspace(-16, 64, bg)
+    y = np.linspace(64, -16, bg)
+    assert np.isclose(np.polynomial.polynomial.polymul(x,y), fmul(x,y)).all()

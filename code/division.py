@@ -22,13 +22,13 @@ def __getn(target, n = 1):
         n = n<<1
     return n
 
-def __monic_inverse(h : np.ndarray, n : int) -> np.ndarray:
+def __inverse(h : np.ndarray, n : int) -> np.ndarray:
     if n == 1:
-        return np.ones(1)
+        return 1 / h
     
     n2 = int(n/2)
 
-    a  = __monic_inverse(h[:n2], n2)
+    a  = __inverse(h[:n2], n2)
     h0 = h[:n2]
     h1 = h[n2:n]
 
@@ -44,7 +44,7 @@ def __fdiv(f : np.ndarray, g : np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 
     gn = __getn(len(f))
     gpad = np.pad(grev, (0, gn-len(g)))
-    qrev = fmul(__monic_inverse(gpad, gn), frev)
+    qrev = fmul(__inverse(gpad, gn), frev)
     
     qn = len(f) - len(g) + 1
     rn = len(f) - qn
@@ -55,16 +55,19 @@ def __fdiv(f : np.ndarray, g : np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 def fdiv(f : np.ndarray, g : np.ndarray) -> np.ndarray:
     """ Division with hensel lifting inverses, using fft multiplication
     """
-    # what if factor is negative? we won't worry about that now
-    factor = g[-1]
-    g = g / factor
-    q, r = __fdiv(f, g)
-    return q / factor, r
+    if g[-1] < 0:
+        g = - g
+        q, r = __fdiv(f, g)
+        return -q, r
+    
+    return __fdiv(f, g)
 
 def __compare(n, m):
     x = np.linspace( 16, -64, n)
     y = np.linspace(-64,  16, m)
-
+    if m % 2 == 1:
+        y = -y
+    
     q_ref, r_ref = ldiv(x,y)
     q_fft, r_fft = fdiv(x,y)
 

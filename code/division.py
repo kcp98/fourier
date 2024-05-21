@@ -42,15 +42,14 @@ def __inverse(h : np.ndarray, n : int) -> np.ndarray:
 def __fdiv(f : np.ndarray, g : np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     frev, grev = f[::-1], g[::-1]
 
-    gn = __getn(len(f))
-    gpad = np.pad(grev, (0, gn-len(g)))
-    qrev = fmul(__inverse(gpad, gn), frev)
-    
-    qn = len(f) - len(g) + 1
-    rn = len(f) - qn
-    q  = qrev[:qn][::-1]
+    n = __getn(len(f))
+    gpad = np.pad(grev, (0, -len(g) + n))
+    qrev = fmul(__inverse(gpad, n), frev)
+
+    nq, nr = len(f) - len(g) + 1, len(g) - 1
+    q  = qrev[:nq][::-1]
     r  = f - fmul(g, q)
-    return q, r[:rn]
+    return q, r[:nr]
 
 def fdiv(f : np.ndarray, g : np.ndarray) -> np.ndarray:
     """ Division with hensel lifting inverses, using fft multiplication

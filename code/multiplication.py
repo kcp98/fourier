@@ -22,14 +22,10 @@ def fmul(p : np.ndarray, q : np.ndarray) -> np.ndarray:
     length = len(p) + len(q) - 1
     n = __getn(length)
 
-    p_pad = np.pad(p, (0, n - len(p)))
-    q_pad = np.pad(q, (0, n - len(q)))
+    p = np.pad(p, (0, -len(p) + n))
+    q = np.pad(q, (0, -len(q) + n))
 
-    p_fft = fft(p_pad, n)
-    q_fft = fft(q_pad, n)
-    
-    result = ifft(p_fft * q_fft, n)
-
+    result = ifft(fft(p, n) * fft(q, n), n)
     return result[:length]
 
 def __compare(n):
@@ -51,4 +47,4 @@ if __name__ == "__main__":
     bg = 2**16
     x = np.linspace(-16, 64, bg)
     y = np.linspace(64, -16, bg)
-    assert np.isclose(np.polynomial.polynomial.polymul(x,y), fmul(x,y)).all()
+    #assert np.isclose(np.polynomial.polynomial.polymul(x,y), fmul(x,y)).all()

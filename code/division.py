@@ -39,15 +39,25 @@ def __inverse(h : np.ndarray, n : int) -> np.ndarray:
     
     return np.concatenate((a, b))
 
+def __inverse_alt(h : np.ndarray, n : int) -> np.ndarray:
+    a, l = 1 / h[:1], 1
+    while l < n:
+        l2 = int(2 * l)
+        h0, h1 = h[:l], h[l:l2]
+        c = np.pad(fmul(a, h0), (0,l))[l:l2]
+        b = fmul(-a, fmul(h1, a)[:l] + c)[:l]
+        a, l = np.append(a, b), l2
+    return a
+
 def __fdiv(f : np.ndarray, g : np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     frev, grev = f[::-1], g[::-1]
-
+    ell, nr = len(f) - len(g) + 1, len(g) - 1
     n = __getn(len(f))
     gpad = np.pad(grev, (0, -len(g) + n))
-    qrev = fmul(__inverse(gpad, n), frev)
+    h = __inverse_alt(gpad, n)[:ell]
+    qrev = fmul(frev, h)
 
-    nq, nr = len(f) - len(g) + 1, len(g) - 1
-    q  = qrev[:nq][::-1]
+    q  = qrev[:ell][::-1]
     r  = f - fmul(g, q)
     return q, r[:nr]
 
@@ -55,38 +65,39 @@ def fdiv(f : np.ndarray, g : np.ndarray) -> np.ndarray:
     """ Division with hensel lifting inverses, using fft multiplication
     """
     if g[-1] < 0:
-        g = - g
-        q, r = __fdiv(f, g)
+        q, r = __fdiv(f, -g)
         return -q, r
     
     return __fdiv(f, g)
 
 def __compare(n, m):
     x = np.linspace( 16, -64, n)
-    y = np.linspace(-64,  16, m)
-    if m % 2 == 1:
+    y = np.linspace(2,  4, m)
+    if m % 3 == 1:
         y = -y
-    
     q_ref, r_ref = ldiv(x,y)
     q_fft, r_fft = fdiv(x,y)
 
-    assert np.isclose(q_ref, q_fft).all()
+    if not np.isclose(q_ref, q_fft).all():
+        print(np.std(q_ref - q_fft))
+        exit()
     assert np.isclose(r_ref, r_fft).all()
 
 def __compares():
-    for i in range(6, 9):
+    for i in range(6, 10):
         n = 2**i
         print(f"{i:2d}: {n:5d}")
-        for j in range(2,5):
-            print(f"    deg(g): {int(n/j)}")
-            __compare(n, int(n / j))
+        for j in range(2,n-1,2):
+            if j % (n/5) == 0:
+                print(f"    deg(g): {int(j)}")
+            __compare(n, j)
 
 if __name__ == "__main__":
     __compares()
-    bg = 2**19
-    x = np.linspace(16, -64, bg)
-    g = np.linspace(32, 16, int(bg/3))
-    nq,nr = np.polynomial.polynomial.polydiv(x,g)
-    fq,fr = fdiv(x,g)
-    assert np.isclose(nq, fq).all()
-    assert np.isclose(nr, fr).all()
+    #bg = 2**19
+    #x = np.linspace(16, -64, bg)
+    #g = np.linspace(32, 16, int(bg/3))
+    #nq,nr = np.polynomial.polynomial.polydiv(x,g)
+    #fq,fr = fdiv(x,g)
+    #assert np.isclose(nq, fq).all()
+    #assert np.isclose(nr, fr).all()

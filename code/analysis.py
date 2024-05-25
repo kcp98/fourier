@@ -27,6 +27,7 @@ def timestmt(n : int, stmt : str):
 
 def benchmark(func, fname, limit = 10):
     # Running time (seconds), memory usage (MB)
+    ns = np.array([1 << i for i in range(5, limit)])
     res = np.array([func(1 << i) for i in range(5, limit)])
     r  = np.vstack((ns,res[:,0], res[:,1]))
     np.savetxt(f"benchmark/data/{fname}.txt", r.T, delimiter=',', header="n,seconds,MB")
@@ -41,4 +42,4 @@ options = {
 if __name__ == "__main__":
     #benchmark(options[args.algo], args.algo, limit=19) # mul
     #benchmark(options[args.algo], args.algo, limit=21) # div
-    pass
+    benchmark(options[args.algo], args.algo, limit=15)

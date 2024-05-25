@@ -39,22 +39,17 @@ def __inverse(h : np.ndarray, n : int) -> np.ndarray:
     
     return np.concatenate((a, b))
 
-def __inverse_alt(h : np.ndarray, n : int) -> np.ndarray:
-    a, l = 1 / h[:1], 1
-    while l < n:
-        l2 = int(2 * l)
-        h0, h1 = h[:l], h[l:l2]
-        c = np.pad(fmul(a, h0), (0,l))[l:l2]
-        b = fmul(-a, fmul(h1, a)[:l] + c)[:l]
-        a, l = np.append(a, b), l2
-    return a
+def inverse(h : np.ndarray, ell : int) -> np.ndarray:
+    n  = __getn(ell)
+    if n > len(h):
+        h  = np.pad(h, (0, -len(h) + n))
+    hi = __inverse(h, n)
+    return hi[:ell]
 
 def __fdiv(f : np.ndarray, g : np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     frev, grev = f[::-1], g[::-1]
     ell, nr = len(f) - len(g) + 1, len(g) - 1
-    n = __getn(len(f))
-    gpad = np.pad(grev, (0, -len(g) + n))
-    h = __inverse_alt(gpad, n)[:ell]
+    h = inverse(grev, ell)
     qrev = fmul(frev, h)
 
     q  = qrev[:ell][::-1]

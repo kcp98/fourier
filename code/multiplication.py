@@ -28,6 +28,12 @@ def fmul(p : np.ndarray, q : np.ndarray) -> np.ndarray:
     result = ifft(fft(p, n) * fft(q, n), n)
     return result[:length]
 
+def fmul_np(p : np.ndarray, q : np.ndarray) -> np.ndarray:
+    """ Multiplication using fft
+    """
+    length = len(p) + len(q) - 1
+    return np.fft.ifft(np.fft.fft(p, length) * np.fft.fft(q, length), length)
+
 def __compare(n):
     x = np.linspace(-16, 64, n)
     y = np.linspace(64, -16, n)

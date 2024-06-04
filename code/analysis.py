@@ -6,7 +6,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--algo", help="the algorithm to benchmark", required=True)
 args = parser.parse_args()
-assert args.algo in ["fmul", "nmul", "fdiv", "ndiv"]
+assert args.algo in ["fmul", "nmul", "fdiv", "ndiv", "fmul_np"]
 
 def get_mem():
     ru_maxrss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
@@ -15,7 +15,7 @@ def get_mem():
 def timestmt(n : int, stmt : str):
     SETUP_CODE = (
         f"import numpy as np; n = {n};"
-        + "from multiplication import fmul;"
+        + "from multiplication import fmul, fmul_np;"
         + "from division import fdiv;"
         + "x = np.linspace(-64, 64, n);"
         + "y = np.linspace(32, -16, n);"
@@ -36,10 +36,11 @@ options = {
     "fmul": lambda n : timestmt(n, "fmul(x,y)"),
     "nmul": lambda n : timestmt(n, "np.polynomial.polynomial.polymul(x,y)"),
     "fdiv": lambda n : timestmt(n, "fdiv(x,g)"),
-    "ndiv": lambda n : timestmt(n, "np.polynomial.polynomial.polydiv(x,g)")
+    "ndiv": lambda n : timestmt(n, "np.polynomial.polynomial.polydiv(x,g)"),
+    "fmul_np": lambda n : timestmt(n, "fmul_np(x,y)"),
 }
 
 if __name__ == "__main__":
     #benchmark(options[args.algo], args.algo, limit=19) # mul
     #benchmark(options[args.algo], args.algo, limit=21) # div
-    benchmark(options[args.algo], args.algo, limit=15)
+    benchmark(options[args.algo], args.algo, limit=19)

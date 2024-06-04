@@ -41,6 +41,40 @@ subtitles = {
     "mul": "multiplication"
 }
 
+def plotnp():
+    dx,dy,dz = load(f"nmul")
+    mx,my,mz = load(f"fmul_np")
+    fig, (ax1, ax2) = plt.subplots(1,2)
+    fig.suptitle(f"NumPy FFT vs long multiplication", fontsize=16)
+    fig.set_size_inches(18, 6)
+
+    if True: # time, fast fourier O(nlgn)
+        ax1.plot(mx, my, color="cyan", linewidth=3, label='fft')
+        ax1.plot(dx, dy, color="crimson",   linewidth=3, label='long')
+        ax1.set_xticks(dx[-4::])
+        ax1.set_yticks(dy[-4::])
+        ax1.set_xticklabels([f"2^{j:.0f}" for j in np.log2(dx[-4::])])
+        ax1.set_title(f"Time", fontsize=16)
+        ax1.set_ylabel('time (seconds)', fontsize=16)
+        ax1.set_xlabel('input size', fontsize=16)
+        ax1.legend(prop={'size': 14})
+    
+    if True: # time, fast fourier O(nlgn)
+        ax2.plot(mx, mz, color="cyan", linewidth=3, label='fft')
+        ax2.plot(dx, dz, color="crimson",   linewidth=3, label='long')
+        ax2.set_xticks(mx[-4::])
+        ax2.set_yticks(mz[-4::])
+        ax2.set_xticklabels([f"2^{j:.0f}" for j in np.log2(mx[-4::])])
+        ax2.set_title(f"Memory", fontsize=16)
+        ax2.set_ylabel('memory (MB)', fontsize=16)
+        ax2.set_xlabel('input size', fontsize=16)
+        ax2.legend(prop={'size': 14})
+
+    fig.savefig(f"benchmark/images/npfft.png")
+    fig.clear()
+
+    pass
+
 def plotmul():
     nx,ny,nz = load(f"n{args.algo}")
     x,y,z    = load(f"f{args.algo}")
@@ -80,4 +114,4 @@ def plotmul():
     fig.savefig(f"benchmark/images/{args.algo}.png")
     fig.clear()
 
-plotmul()
+plotnp()

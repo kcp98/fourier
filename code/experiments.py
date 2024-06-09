@@ -46,6 +46,15 @@ def div_2():
             y = np.linspace(50, 10,  m)
         )
 
+def div_3():
+    n = 2**15
+    for m in range(1,int(n/3),27):
+        div_0(
+            x = np.linspace(20, 100, n),
+            y = np.linspace(50, 10,  m)
+        )
+div_3()
+
 def mul_0(x,y):
     fr = fmul(x,y)
     nr = np.polynomial.polynomial.polymul(x,y)

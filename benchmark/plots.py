@@ -7,7 +7,7 @@ parser.add_argument("--algo", help="the algorithm to benchmark", required=True)
 args = parser.parse_args()
 assert args.algo in ["mul", "div"]"""
 class args:
-    algo = "mul"
+    algo = "eval"
 
 def regression(x : np.array, y : np.array):
     # linear for for y = m * x + b and r^2
@@ -34,10 +34,12 @@ def plotsub(ax, x, fx, y, **kwargs):
 
 titles = {
     "div": "Polynomial division",
+    "eval": "Multipoint evaluation",
     "mul": "Polynomial multiplication"
 }
 subtitles = {
     "div": "division",
+    "eval": "Multipoint evaluation",
     "mul": "multiplication"
 }
 
@@ -48,12 +50,15 @@ def plotnp():
     fig.suptitle(f"NumPy FFT vs long multiplication", fontsize=16)
     fig.set_size_inches(18, 6)
 
+    dx,dy,dz = dx[:-8],dy[:-8],dz[:-8]
+    mx,my,mz = mx[:-8],my[:-8],mz[:-8]
+
     if True: # time, fast fourier O(nlgn)
         ax1.plot(mx, my, color="cyan", linewidth=3, label='fft')
         ax1.plot(dx, dy, color="crimson",   linewidth=3, label='long')
-        ax1.set_xticks(dx[-4::])
-        ax1.set_yticks(dy[-4::])
-        ax1.set_xticklabels([f"2^{j:.0f}" for j in np.log2(dx[-4::])])
+        ax1.set_xticks(dx[-4:])
+        ax1.set_yticks(dy[-4:])
+        ax1.set_xticklabels([f"2^{j:.0f}" for j in np.log2(dx[-4:])])
         ax1.set_title(f"Time", fontsize=16)
         ax1.set_ylabel('time (seconds)', fontsize=16)
         ax1.set_xlabel('input size', fontsize=16)
@@ -84,8 +89,9 @@ def plotmul():
     fig.set_size_inches(18, 6)
 
     if True: # time, fast fourier O(nlgn)
-        plotsub(ax1, x, x * np.log(x), y, color="cyan", linewidth=3, label='FFT')
-        ax1.set_title(f"fft {subtitles[args.algo]}: " + r"$O(n \lg n)$", fontsize=16)
+        # change for multipoint evaluation
+        plotsub(ax1, x, x * np.log(x) * np.log(x), y, color="cyan", linewidth=3, label='FFT')
+        ax1.set_title(f"fft {subtitles[args.algo]}: " + r"$O(n \lg^2 n)$", fontsize=16)
         ax1.set_ylabel('time (seconds)', fontsize=16)
         ax1.set_xlabel('input size', fontsize=16)
         ax1.legend(prop={'size': 14})
@@ -114,4 +120,5 @@ def plotmul():
     fig.savefig(f"benchmark/images/{args.algo}.png")
     fig.clear()
 
-plotnp()
+#plotnp()
+plotmul()

@@ -53,8 +53,6 @@ def div_3():
             x = np.linspace(20, 100, n),
             y = np.linspace(50, 10,  m)
         )
-div_3()
-
 def mul_0(x,y):
     fr = fmul(x,y)
     nr = np.polynomial.polynomial.polymul(x,y)
@@ -95,7 +93,7 @@ def eval_0(x,y):
         print("-----------------------------------------")
 
 def eval_1():
-    for i in range(1,7):
+    for i in range(1,9):
         n = 2**i
         eval_0(
             x = np.linspace(-30, 30, n),
@@ -103,7 +101,7 @@ def eval_1():
         )
 
 def eval_2():
-    for i in range(1,7):
+    for i in range(1,9):
         n = 2**i
         eval_0(
             x = np.linspace(-3, 3, n),

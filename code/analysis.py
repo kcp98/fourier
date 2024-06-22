@@ -19,7 +19,7 @@ def timestmt(n : int, stmt : str):
         f"import numpy as np; n = {n};"
         + "from multiplication import fmul, fmul_np;"
         + "from division import fdiv;"
-        + "from evaluation import mpe;"
+        + "from evaluation import feval;"
         + "x = np.linspace(-64, 64, n);"
         + "y = np.linspace(32, -16, n);"
         + "g = np.linspace(32, 16, int(n/3));"
@@ -41,7 +41,7 @@ options = {
     "fdiv": lambda n : timestmt(n, "fdiv(x,g)"),
     "ndiv": lambda n : timestmt(n, "np.polynomial.polynomial.polydiv(x,g)"),
     "fmul_np": lambda n : timestmt(n, "fmul_np(x,y)"),
-    "feval": lambda n : timestmt(n, "mpe(x,y,n)"),
+    "feval": lambda n : timestmt(n, "feval(x,y,n)"),
     "neval": lambda n : timestmt(n, "np.polynomial.polynomial.polyval(y,x)"),
 }
 
